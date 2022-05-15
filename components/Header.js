@@ -6,9 +6,7 @@ export const Header = (props) => {
     <Box>
       <Container>
         <Box fontSize="2xl" bg="red" borderRadius="lg" align="center" p="2">
-          {props.user
-            ? `Welcome ${props.user.split(" ", 1)}`
-            : "Welcome to the Blog"}
+          {props.user ? "Welcome to the Blog" : "Please Log In"}
         </Box>
       </Container>
     </Box>

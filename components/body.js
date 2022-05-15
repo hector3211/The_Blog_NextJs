@@ -121,7 +121,7 @@ export const Body = () => {
   };
   return (
     <Box>
-      <Container>
+      <Container boxShadow="base" rounded="md" py="3">
         <FormControl>
           <FormLabel htmlFor="blog title">Blog title</FormLabel>
           <Input
@@ -160,19 +160,10 @@ export const Body = () => {
           )}
         </Center>
       </Container>
-      <Container>
-        <Divider my="5" />
+      <Container mt="5">
         {data.map((data) => {
           return (
-            <Box
-              key={data.id}
-              py="10"
-              textAlign="start"
-              _hover={{
-                boxShadow: "base",
-                rounded: "md",
-              }}
-            >
+            <Box key={data.id} py="10" textAlign="start">
               <Container>
                 <Heading
                   _hover={{

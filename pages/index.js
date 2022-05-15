@@ -1,5 +1,15 @@
-import { Box, Flex, Text, Container, Center, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Container,
+  Center,
+  Button,
+  Icon,
+} from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import { FaGooglePlay } from "react-icons/fa";
+import { ImEnvelop } from "react-icons/im";
 import Link from "next/link";
 import { Header } from "../components/Header";
 import { Body } from "../components/body";
@@ -11,7 +21,6 @@ export default function Home() {
   const logIn = () => {
     signInWithGoogle()
       .then((result) => {
-        console.log(result);
         const name = result.user.displayName;
         localStorage.setItem("name", name);
         sessionStorage.setItem("gmailToken", result.user.accessToken);
@@ -56,7 +65,19 @@ export default function Home() {
                 colorScheme="white"
                 onClick={logIn}
               >
-                Log In
+                <Text>Log In With Google</Text>
+                <Icon as={FaGooglePlay} ml="2" />
+              </Button>
+              <Button
+                mx={2}
+                variant="outline"
+                p="1"
+                size="s"
+                colorScheme="white"
+                // make a chakura modal to sign up the user
+              >
+                <Text>Log In With Email</Text>
+                <Icon as={ImEnvelop} ml="2" />
               </Button>
             </Flex>
           )}
@@ -66,19 +87,21 @@ export default function Home() {
                 onClick={() => {
                   setUser("");
                   setSignedIn(false);
+                  sessionStorage.setItem("emailToken", "");
+                  sessionStorage.setItem("gmailToken", "");
                 }}
                 variant="outline"
                 p="1"
                 size="s"
                 colorScheme="white"
               >
-                Log Out
+                <Text>Log Out</Text>
               </Button>
             </Center>
           )}
         </Center>
         <Container>
-          <Header user={user} />
+          <Header user={signedin} />
         </Container>
         <Box pt="10">{signedin && <Body />}</Box>
       </Box>
