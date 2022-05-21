@@ -1,109 +1,102 @@
 import {
   Box,
   Flex,
-  Text,
   Container,
   Center,
   Button,
-  Icon,
+  Text,
+  chakra,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { FaGooglePlay } from "react-icons/fa";
-import { ImEnvelop } from "react-icons/im";
 import Link from "next/link";
 import { Header } from "../components/Header";
 import { Body } from "../components/body";
-import { signInWithGoogle } from "../firebase";
-
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { motion, isValidMotionProp } from "framer-motion";
 export default function Home() {
   const [signedin, setSignedIn] = useState(false);
   const [user, setUser] = useState("");
-  const logIn = () => {
-    signInWithGoogle()
-      .then((result) => {
-        const name = result.user.displayName;
-        localStorage.setItem("name", name);
-        sessionStorage.setItem("gmailToken", result.user.accessToken);
-        setUser(name);
-        setSignedIn(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const [admin, setAdmin] = useState("");
+  const ChakraBox = chakra(motion.div, {
+    shouldForwardProp: (prop) => isValidMotionProp(prop) || prop === "children",
+  });
   useEffect(() => {
     if (
       sessionStorage.getItem("emailToken") ||
       sessionStorage.getItem("gmailToken")
     ) {
+      setUser(sessionStorage.getItem("displayName"));
       setSignedIn(true);
     }
   }, []);
-
+  const signOutUser = () => {
+    signOut(auth)
+      .then(() => {
+        sessionStorage.setItem("emailToken", "");
+        sessionStorage.setItem("gmailToken", "");
+        sessionStorage.setItem("displayName", "");
+        sessionStorage.setItem("admin", "");
+        setUser("");
+        setSignedIn(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <Box>
       <Box>
         <Center mb="5">
           {signedin ? (
-            ""
+            <ChakraBox whileHover={{ scale: 1.3 }} whileTap={{ scale: 0.9 }}>
+              <Button
+                onClick={signOutUser}
+                variant="solid"
+                p="2"
+                size="md"
+                colorScheme="blue"
+              >
+                Log Out
+              </Button>
+            </ChakraBox>
           ) : (
             <Flex>
-              <Button
-                mx={2}
-                variant="outline"
-                p="1"
-                size="s"
-                colorScheme="white"
-              >
-                <Link href={`/signup`}>Sign Up</Link>
-              </Button>
-              <Button
-                mx={2}
-                variant="outline"
-                p="1"
-                size="s"
-                colorScheme="white"
-                onClick={logIn}
-              >
-                <Text>Log In With Google</Text>
-                <Icon as={FaGooglePlay} ml="2" />
-              </Button>
-              <Button
-                mx={2}
-                variant="outline"
-                p="1"
-                size="s"
-                colorScheme="white"
-                // make a chakura modal to sign up the user
-              >
-                <Text>Log In With Email</Text>
-                <Icon as={ImEnvelop} ml="2" />
-              </Button>
+              <ChakraBox whileHover={{ scale: 1.3 }} whileTap={{ scale: 0.9 }}>
+                <Link href={`/signup`}>
+                  <Button
+                    mx={2}
+                    variant="solid"
+                    size="md"
+                    width="90px"
+                    colorScheme="blue"
+                  >
+                    <Text fontSize={"lg"}>Sign Up</Text>
+                  </Button>
+                </Link>
+              </ChakraBox>
+              <ChakraBox whileHover={{ scale: 1.3 }} whileTap={{ scale: 0.9 }}>
+                <Link href={`/login`}>
+                  <Button
+                    mx={2}
+                    variant="solid"
+                    size="md"
+                    width="90px"
+                    colorScheme="green"
+                  >
+                    <Text fontSize={"lg"}>Log In</Text>
+                  </Button>
+                </Link>
+              </ChakraBox>
             </Flex>
-          )}
-          {signedin && (
-            <Center>
-              <Button
-                onClick={() => {
-                  setUser("");
-                  setSignedIn(false);
-                  sessionStorage.setItem("emailToken", "");
-                  sessionStorage.setItem("gmailToken", "");
-                }}
-                variant="outline"
-                p="1"
-                size="s"
-                colorScheme="white"
-              >
-                <Text>Log Out</Text>
-              </Button>
-            </Center>
           )}
         </Center>
         <Container>
-          <Header user={signedin} />
+          <Header user={user} />
         </Container>
-        <Box pt="10">{signedin && <Body />}</Box>
+        <Box pt="10">
+          {signedin && <Body admin={sessionStorage.getItem("admin")} />}
+        </Box>
       </Box>
     </Box>
   );

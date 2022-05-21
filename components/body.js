@@ -25,7 +25,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useState, useEffect } from "react";
-export const Body = () => {
+export const Body = (props) => {
   const toast = useToast();
   const router = useRouter();
   const databaseRef = collection(db, "posts");
@@ -35,8 +35,9 @@ export const Body = () => {
   const [data, setData] = useState([]);
   const [isUpdate, setIsUpdate] = useState(false);
   useEffect(() => {
-    let token = sessionStorage.getItem("gmailToken");
-    if (token) {
+    let gmailToken = sessionStorage.getItem("gmailToken");
+    let emailToken = sessionStorage.getItem("emailToken");
+    if (gmailToken || emailToken) {
       getData();
     }
   }, []);
@@ -121,45 +122,49 @@ export const Body = () => {
   };
   return (
     <Box>
-      <Container boxShadow="base" rounded="md" py="3">
-        <FormControl>
-          <FormLabel htmlFor="blog title">Blog title</FormLabel>
-          <Input
-            type="text"
-            value={blogTitle}
-            onChange={(e) => setBlogTitle(e.target.value)}
-          />
-          <FormLabel htmlFor="blog content">Post content</FormLabel>
-          <Textarea
-            value={blogConttent}
-            type="text"
-            onChange={(e) => setBlogContent(e.target.value)}
-          />
-        </FormControl>
-        <Center>
-          {isUpdate ? (
-            <Button
-              onClick={updateFields}
-              mt="3"
-              variant="outline"
-              size="md"
-              colorScheme="white"
-            >
-              Update
-            </Button>
-          ) : (
-            <Button
-              onClick={addData}
-              mt="3"
-              variant="outline"
-              size="md"
-              colorScheme="white"
-            >
-              Post
-            </Button>
-          )}
-        </Center>
-      </Container>
+      {props.admin && (
+        <Container boxShadow="base" rounded="md" py="3">
+          <FormControl>
+            <FormLabel htmlFor="blog title">Blog title</FormLabel>
+            <Input
+              type="text"
+              value={blogTitle}
+              onChange={(e) => setBlogTitle(e.target.value)}
+            />
+            <FormLabel htmlFor="blog content">Post content</FormLabel>
+            <Textarea
+              value={blogConttent}
+              type="text"
+              onChange={(e) => setBlogContent(e.target.value)}
+            />
+          </FormControl>
+          <Center>
+            {isUpdate ? (
+              <Button
+                onClick={updateFields}
+                mt="3"
+                variant="solid"
+                size="md"
+                width="90px"
+                colorScheme="blue"
+              >
+                Update
+              </Button>
+            ) : (
+              <Button
+                onClick={addData}
+                mt="3"
+                variant="solid"
+                size="md"
+                width="90px"
+                colorScheme="green"
+              >
+                Post
+              </Button>
+            )}
+          </Center>
+        </Container>
+      )}
       <Container mt="5">
         {data.map((data) => {
           return (
@@ -179,21 +184,23 @@ export const Body = () => {
                   {data.title}
                 </Heading>
                 <Text>{data.body}</Text>
-                <Flex justifyContent={"end"}>
-                  <DeleteIcon
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => deleteDocument(data.id)}
-                    w={3}
-                    h={3}
-                  />
-                  <EditIcon
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => getId(data.id, data.title, data.body)}
-                    mx={2}
-                    w={3}
-                    h={3}
-                  />
-                </Flex>
+                {props.admin && (
+                  <Flex justifyContent={"end"}>
+                    <DeleteIcon
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => deleteDocument(data.id)}
+                      w={3}
+                      h={3}
+                    />
+                    <EditIcon
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => getId(data.id, data.title, data.body)}
+                      mx={2}
+                      w={3}
+                      h={3}
+                    />
+                  </Flex>
+                )}
               </Container>
             </Box>
           );
